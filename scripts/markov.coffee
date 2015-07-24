@@ -8,11 +8,11 @@
 #   None
 #
 # Commands:
-#   holly markov - post a markov message based on the past N chat messages
-#   holly markov <user> - post a markov message based on chat messages made by <user>
-#   holly markov <url> - post a markov message based on contents of the provided web page (very basic)
-#   holly markov learn <url>|<text> - add the contents of the URL or supplied text to the messageCache
-#   holly markov reset - reset the message messageCache
+#   Holly markov - post a markov message based on the past N chat messages
+#   Holly markov <user> - post a markov message based on chat messages made by <user>
+#   Holly markov <url> - post a markov message based on contents of the provided web page (very basic)
+#   Holly markov learn <url>|<text> - add the contents of the URL or supplied text to the messageCache
+#   Holly markov reset - reset the message messageCache
 #
 # Notes:
 #   None
@@ -119,6 +119,9 @@ learnMarkovForUrl = (robot, url, msg) ->
     try
       message = generateMessage(msg, corpus)
       msg.send "IQ increased by " + message.length
+      robot.brain.data.iq.current = robot.brain.data.iq.current + message.length
+      robot.brain.data.iq.time = new Date()
+
     catch e
       msg.send "IQ failed to increase."
 
@@ -152,7 +155,6 @@ module.exports = (robot) ->
     else
       said = msg.match[1]
       messageCache = robot.brain.data.markov.messageCache
-      console.log(said)
       messageCache.push({user: own_name, said: said})
       message = generateMessage(msg, said)
       msg.send "IQ increased by " + message.length
@@ -183,7 +185,6 @@ module.exports = (robot) ->
 
     # Store message in cache
     messageCache = robot.brain.data.markov.messageCache
-    console.log(said)
     messageCache.push({user: lcUserName, said: said})
 
     # Limit size of messageCache

@@ -12,6 +12,23 @@ has, etc!
 [hubot]: http://hubot.github.com
 [generator-hubot]: https://github.com/github/generator-hubot
 
+### Installing Linux dependcies
+
+You'll need node and npm:
+
+    curl -sL https://deb.nodesource.com/setup | sudo bash -
+    sudo apt-get install nodejs
+
+You'll also need redis for Holly's brain:
+
+    sudo apt-get install redis-server
+
+Then clone this repo from GitHub.  Change into the directory and run:
+
+    npm install
+
+That should be it...
+
 ### Running Holly Locally
 
 You can test your hubot by running the following, however some plugins will not

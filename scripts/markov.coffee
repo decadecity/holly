@@ -40,7 +40,8 @@ generateMessage = (msg, corpus) ->
   else
     transitions = generateTransitions(corpus)
 
-    startWords = (word for own word, data of transitions when data.begins == true)
+    startWords = (word for own word, data of transitions when word.length and data.begins == true)
+
     word = msg.random(startWords)
     generatedMessage = [word]
 
@@ -50,7 +51,8 @@ generateMessage = (msg, corpus) ->
     while (i++ < MAX_GENERATED_MESSAGE_LENGTH)
       generatedMessage.push(next.word)
       if next.ends
-        return generatedMessage.join(' ')
+        message = generatedMessage.join(' ')
+        return message
       else
         next = msg.random(transitions[next.word].list)
 
@@ -65,18 +67,17 @@ generateTransitions = (corpus) ->
     for i in [0..(words.length - 1)]
       word = words[i]
 
-      if '' + word
-        transition = transitions[word]
-        if not transition
-          transition = {
-            begins: (i == 0),
-            list: []
-          }
+      transition = transitions[word]
+      if not transition
+        transition = {
+          begins: (i == 0),
+          list: []
+        }
 
-        transition.list.push({
-          word: words[i + 1],
-          ends: (i == words.length - 1)
-        })
+      transition.list.push({
+        word: words[i + 1],
+        ends: (i == words.length - 1)
+      })
 
       transitions[word] = transition
 
@@ -89,6 +90,7 @@ sendGenericMarkov = (robot, msg) ->
   message = generateMessage(msg, corpus)
   msg.send message
 
+
 sendMarkovForUrl = (url, msg) ->
   request url, (err, res, body) ->
     $ = cheerio.load body,
@@ -97,11 +99,13 @@ sendMarkovForUrl = (url, msg) ->
     corpus = []
     $('script').remove()
     $('p').each (index, el) ->
-      corpus.push $(this).text()
+      if text.split(/\s/).length < 3
+        corpus.push $(this).text()
     try
       msg.send generateMessage(msg, corpus)
     catch e
       msg.send "There was an error generating a Markov chain"
+
 
 learnMarkovForUrl = (robot, url, msg) ->
   request url, (err, res, body) ->
@@ -113,8 +117,9 @@ learnMarkovForUrl = (robot, url, msg) ->
     $('script').remove()
     $('p').each (index, el) ->
       text = $(this).text()
-      corpus.push text
-      messageCache.push({user: own_name, said: text})
+      if text.split(/\s/).length < 3
+        corpus.push text
+        messageCache.push({user: own_name, said: text})
 
     try
       message = generateMessage(msg, corpus)
@@ -154,10 +159,11 @@ module.exports = (robot) ->
       learnMarkovForUrl(robot, url, msg)
     else
       said = msg.match[1]
-      messageCache = robot.brain.data.markov.messageCache
-      messageCache.push({user: own_name, said: said})
-      message = generateMessage(msg, said)
-      msg.send "IQ increased by " + message.length
+      if said.length
+        messageCache = robot.brain.data.markov.messageCache
+        messageCache.push({user: own_name, said: said})
+        message = generateMessage(msg, said)
+        msg.send "IQ increased by " + message.length
 
   robot.respond /markov reset/i, (msg) ->
     robot.brain.data.markov.messageCache = []

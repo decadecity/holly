@@ -51,8 +51,7 @@ generateMessage = (msg, corpus) ->
     while (i++ < MAX_GENERATED_MESSAGE_LENGTH)
       generatedMessage.push(next.word)
       if next.ends
-        message = generatedMessage.join(' ')
-        return message
+        return generatedMessage.join(' ')
       else
         next = msg.random(transitions[next.word].list)
 
@@ -62,7 +61,10 @@ generateTransitions = (corpus) ->
   transitions = {}
 
   for said in corpus
-    words = said.split(saidSplitter)
+    words = []
+    for word in said.split(saidSplitter)
+      if word.length
+        words.push word
 
     for i in [0..(words.length - 1)]
       word = words[i]
@@ -130,18 +132,40 @@ learnMarkovForUrl = (robot, url, msg) ->
     catch e
       msg.send "IQ failed to increase."
 
+
 module.exports = (robot) ->
 
   robot.brain.on 'loaded', =>
     robot.brain.data.markov ||= {}
     robot.brain.data.markov.messageCache ||= []
 
+
   robot.respond /markov\s*?$/i, (msg) ->
     sendGenericMarkov(robot, msg)
+
+
+  robot.respond /markov-transitions/i, (msg) ->
+    messageCache = robot.brain.data.markov.messageCache
+    corpus = (message.said for message in messageCache)
+    transitions = generateTransitions(corpus)
+
+    message = ''
+    for own word, transition of transitions
+      console.log "\n#{word}: "
+      console.log transition
+
+    message += 'Start words: '
+    for own word, data of transitions when word and data.begins == true
+      message += "#{word} "
+
+    console.log message
+
+
 
   # Respond to questions like "what do you think, hubot?"
   robot.hear ASK_HUBOT_REGEX, (msg) ->
     sendGenericMarkov(robot, msg)
+
 
   robot.respond /markov (?:(?!reset|learn))(.*)$/i, (msg) ->
     if msg.match[1] and msg.match[1].match /https?:\/\/\S+/
@@ -152,6 +176,7 @@ module.exports = (robot) ->
       messageCache = robot.brain.data.markov.messageCache
       corpus = (message.said for message in messageCache when message.user == lcUserName)
       msg.send generateMessage(msg, corpus)
+
 
   robot.respond /markov learn (?:(?!reset))(.*)$/i, (msg) ->
     if msg.match[1] and msg.match[1].match /https?:\/\/\S+/
@@ -165,9 +190,11 @@ module.exports = (robot) ->
         message = generateMessage(msg, said)
         msg.send "IQ increased by " + message.length
 
+
   robot.respond /markov reset/i, (msg) ->
     robot.brain.data.markov.messageCache = []
     msg.send "The Markov cache has been reset."
+
 
   robot.hear /(.*)/i, (msg) ->
     # Ignore messages from specific users

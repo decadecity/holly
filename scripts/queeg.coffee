@@ -1,3 +1,6 @@
+# Description:
+#  Queeg!
+
 module.exports = (robot) ->
 
   robot.hear /queeg/i, (msg) ->

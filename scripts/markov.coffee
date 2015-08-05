@@ -30,7 +30,7 @@ own_name = 'holly'
 IGNORE_USERS = [own_name] # lowercase
 MAX_MESSAGE_CACHE_LENGTH = 2500 # too small = such boring, too big = very memory
 MAX_GENERATED_MESSAGE_LENGTH = 200 # die soon in case of infinite looping case
-ASK_HUBOT_REGEX = new RegExp(own_name + '\\?$', 'i')
+ASK_HUBOT_REGEX = new RegExp('^(.*)' + own_name + '\\?$', 'i')
 OWN_NAME_REGEX = new RegExp('^' + own_name, 'i')
 
 
@@ -102,7 +102,7 @@ sendMarkovForUrl = (url, msg) ->
     $('script').remove()
     $('p').each (index, el) ->
       if text.split(/\s/).length < 3
-        corpus.push $(this).text()
+        corpus.push $(this).text().trim()
     try
       msg.send generateMessage(msg, corpus)
     catch e
@@ -118,7 +118,7 @@ learnMarkovForUrl = (robot, url, msg) ->
     corpus = []
     $('script').remove()
     $('p').each (index, el) ->
-      text = $(this).text()
+      text = $(this).text().trim()
       if text.split(/\s/).length < 3
         corpus.push text
         messageCache.push({user: own_name, said: text})
@@ -186,7 +186,7 @@ module.exports = (robot) ->
       said = msg.match[1]
       if said.length
         messageCache = robot.brain.data.markov.messageCache
-        messageCache.push({user: own_name, said: said})
+        messageCache.push({user: own_name, said: said.trim()})
         message = generateMessage(msg, said)
         msg.send "IQ increased by " + message.length
 
@@ -213,12 +213,14 @@ module.exports = (robot) ->
     # Ignore hubot instructions
     return if said.match(OWN_NAME_REGEX)
 
-    # Ignore questions posed to hubot directly
-    return if said.match(ASK_HUBOT_REGEX)
+    # Stop hubot learning to ask itself questions.
+    _ask_hubot = said.match(ASK_HUBOT_REGEX)
+    if _ask_hubot
+      said = _ask_hubot[1].trim()
 
     # Store message in cache
     messageCache = robot.brain.data.markov.messageCache
-    messageCache.push({user: lcUserName, said: said})
+    messageCache.push({user: lcUserName, said: said.trim()})
 
     # Limit size of messageCache
     messageCacheLength = messageCache.length

@@ -101,8 +101,9 @@ sendMarkovForUrl = (url, msg) ->
     corpus = []
     $('script').remove()
     $('p').each (index, el) ->
+      text = $(this).text().trim()
       if text.split(/\s/).length < 3
-        corpus.push $(this).text().trim()
+        corpus.push text
     try
       msg.send generateMessage(msg, corpus)
     catch e

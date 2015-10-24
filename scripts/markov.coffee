@@ -145,22 +145,29 @@ module.exports = (robot) ->
     sendGenericMarkov(robot, msg)
 
 
-  robot.respond /markov-transitions/i, (msg) ->
+  # Show transitions for a word.
+  robot.respond /markov-transitions (\w+)/i, (msg) ->
     messageCache = robot.brain.data.markov.messageCache
     corpus = (message.said for message in messageCache)
     transitions = generateTransitions(corpus)
 
-    message = ''
-    for own word, transition of transitions
-      console.log "\n#{word}: "
-      console.log transition
+    transition = transitions[msg.match[1]] || {list:[]}
 
-    message += 'Start words: '
-    for own word, data of transitions when word and data.begins == true
-      message += "#{word} "
+    words = {}
+    for t in transition.list
+      if t.word
+        count = words[t.word] || 0
+        count += 1
+        words[t.word] = count
 
-    console.log message
+    if !Object.keys(words).length
+      message = 'No transitions found '
+    else
+      message = ''
+      for word, count of words
+        message = message + word + ':' + count + '\n'
 
+    msg.send message.substring(0, message.length - 1);
 
 
   # Respond to questions like "what do you think, hubot?"

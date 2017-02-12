@@ -6,9 +6,10 @@ drink = 'DRINK! :beer: :cocktail:'
 
 stimulus_response = {
   'try': 'TMO',
-  ':robot:': '`++ TARGETING ++`',
+  ':robot_face:': '`++ TARGETING ++`',
   'kicking cannon': ':boom:',
   'scrum': 'Not straight',
+  'bonus point': 'Bullshit point, more like.',
   'ref cam': drink,
   'TMO': drink,
 }

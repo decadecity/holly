@@ -19,6 +19,7 @@ stimulus_response = {
   'forward score': drink,
   'fat man running with the ball': drink,
   'adverts': ':mute:',
+  'credible feed': drink,
 }
 
 teams = [

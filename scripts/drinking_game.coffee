@@ -13,7 +13,12 @@ stimulus_response = {
   'scrum': 'Not straight',
   'bonus point': 'Bullshit point, more like.',
   'ref cam': drink,
+  'refcam': drink,
   'TMO': drink,
+  'prop score': 'FINISH YOUR ' + drink,
+  'forward score': drink,
+  'fat man running with the ball': drink,
+  'adverts': ':mute:',
 }
 
 teams = [
@@ -70,6 +75,10 @@ module.exports = (robot) ->
     if robot.brain.data.are_we_playing
       msg.send(whos_winning(robot.brain.data.scores))
 
+  robot.respond /what\'s the score/i, (msg) ->
+    if robot.brain.data.are_we_playing
+      msg.send(whos_winning(robot.brain.data.scores))
+
   robot.hear /(.*)/i, (msg) ->
     if robot.brain.data.are_we_playing
       message_text = msg.match[1]
@@ -85,3 +94,4 @@ module.exports = (robot) ->
         if match
           msg.send(response)
           return
+

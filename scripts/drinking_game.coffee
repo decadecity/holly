@@ -14,6 +14,7 @@ stimulus_response = {
   'bonus point': 'Bullshit point, more like.',
   'ref cam': drink,
   'TMO': drink,
+  'credible feed': drink,
 }
 
 teams = [

@@ -32,14 +32,19 @@ teams = [
   ':wal:',
 ]
 
-team_scores = (team_scores) =>
-  scores = ''
-  for (var i = 0, l = team_scores.length; i < l; i += 2)
-    if team_scores[i].score > 0
-      if team_scores[i].score > team_scores[i+1].score
-        scores += team_scores[i].team + ' are beating ' + team_scores[i+1].team + ' ' + team_scores[0].score + '-' + team_scores[1].score + '\n'
-      else
-        scores += "It's " + team_scores[i].score + ' each for ' + team_scores[i].team + ' and ' + team_scores[i+1].team + '\n'
+`function list_scores(team_scores) {
+  scores = '';
+  for (var i = 0, l = team_scores.length; i < l; i += 2) {
+    if (team_scores[i].score > 0) {
+      if (team_scores[i].score > team_scores[i+1].score) {
+        scores += team_scores[i].team + ' are beating ' + team_scores[i+1].team + ' ' + team_scores[0].score + '-' + team_scores[1].score + '\n';
+      } else {
+        scores += "It's " + team_scores[i].score + ' each for ' + team_scores[i].team + ' and ' + team_scores[i+1].team + '\n';
+      }
+    }
+  }
+  return scores;
+}`
 
 
 reset_score = ->

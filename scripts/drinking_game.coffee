@@ -7,7 +7,7 @@ _ = require 'underscore'
 drink = 'DRINK! :beer: :cocktail:'
 
 stimulus_response = {
-  'try': 'TMO',
+  'try\b': 'TMO',
   ':robot_face:': '`++ TARGETING ++`',
   'kicking cannon': ':boom:',
   'scrum': 'Not straight',
@@ -20,6 +20,7 @@ stimulus_response = {
   'fat man running with the ball': drink,
   'adverts': ':mute:',
   'credible feed': drink,
+  'maul': drink,
 }
 
 teams = [
@@ -30,6 +31,16 @@ teams = [
   ':scot:',
   ':wal:',
 ]
+
+team_scores = (team_scores) =>
+  scores = ''
+  for (var i = 0, l = team_scores.length; i < l; i += 2)
+    if team_scores[i].score > 0
+      if team_scores[i].score > team_scores[i+1].score
+        scores += team_scores[i].team + ' are beating ' + team_scores[i+1].team + ' ' + team_scores[0].score + '-' + team_scores[1].score + '\n'
+      else
+        scores += "It's " + team_scores[i].score + ' each for ' + team_scores[i].team + ' and ' + team_scores[i+1].team + '\n'
+
 
 reset_score = ->
   scores = {}
@@ -45,11 +56,8 @@ whos_winning = (scores)->
   team_scores.reverse()
   if team_scores[0].score == 0
     return "Nobody's scored yet."
-  if team_scores[0].score > team_scores[1].score
-    return team_scores[0].team + ' are beating ' + team_scores[1].team + ' ' + team_scores[0].score + '-' + team_scores[1].score
   else
-    return "It's " + team_scores[0].score + ' each for ' + team_scores[0].team + ' and ' + team_scores[1].team
-
+    return list_scores(team_scores)
 
 module.exports = (robot) ->
 
